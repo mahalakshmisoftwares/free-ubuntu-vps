@@ -51,7 +51,7 @@ def index() -> FileResponse:
 def status() -> JSONResponse:
     return JSONResponse({
         "online": True,
-        "os": next((line.split("=", 1)[1].strip('"') for line in Path("/etc/os-release").read_text().splitlines() if line.startswith("PRETTY_NAME")), "unknown"),
+        "debian": Path("/etc/debian_version").read_text().strip() if Path("/etc/debian_version").exists() else "unknown",
         "hostname": os.uname().nodename,
         "shell": "/bin/bash",
         "systemctl": shutil.which("systemctl") is not None,
@@ -135,7 +135,7 @@ async def terminal(websocket: WebSocket) -> None:
 
         await websocket.send_text(json.dumps({
             "type": "ready",
-            "message": "Authenticated. Connected to Ubuntu 24.04 PTY.\r\n",
+            "message": "Authenticated. Connected to Debian 13 PTY.\r\n",
         }))
 
         sender = asyncio.create_task(browser_to_pty())
